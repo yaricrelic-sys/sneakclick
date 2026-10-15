@@ -33,9 +33,6 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-// ВАЖНО: включаем resources в jar
-sourceSets.main.resources { srcDir 'src/main/resources' }
-
 jar {
     manifest {
         attributes([
@@ -44,10 +41,5 @@ jar {
             'Implementation-Title': project.name,
             'Implementation-Version': project.version
         ])
-    }
-    // Копируем resources в корень jar
-    from sourceSets.main.output
-    from('src/main/resources') {
-        include '**/*'
     }
 }
