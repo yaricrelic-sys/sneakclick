@@ -1,48 +1,32 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+', changing: true
-    }
-}
+name: Build Mod
 
-apply plugin: 'net.minecraftforge.gradle'
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
-version = '1.0.0'
-group = 'com.sneakclick'
-archivesBaseName = 'sneakclick'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-minecraft {
-    mappings channel: 'official', version: '1.20.1'
-}
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
-repositories {
-    maven { url = 'https://maven.minecraftforge.net/' }
-    mavenCentral()
-}
+      - name: Build
+        run: gradle build --no-daemon --stacktrace
 
-dependencies {
-    minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
-}
-
-jar {
-    manifest {
-        attributes([
-            'Specification-Title'   : 'sneakclick',
-            'Specification-Vendor'  : 'dj',
-            'Specification-Version' : '1',
-            'Implementation-Title'  : project.name,
-            'Implementation-Version': project.version,
-            'Implementation-Vendor' : 'dj'
-        ])
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-}
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sneakclick-jar
+          path: build/libs/*.jar
