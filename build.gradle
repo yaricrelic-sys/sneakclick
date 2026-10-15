@@ -20,6 +20,11 @@ minecraft {
     mappings channel: 'official', version: '1.20.1'
 }
 
+repositories {
+    maven { url = 'https://maven.minecraftforge.net/' }
+    mavenCentral()
+}
+
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
 }
@@ -27,6 +32,9 @@ dependencies {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
+
+// ВАЖНО: включаем resources в jar
+sourceSets.main.resources { srcDir 'src/main/resources' }
 
 jar {
     manifest {
@@ -36,5 +44,10 @@ jar {
             'Implementation-Title': project.name,
             'Implementation-Version': project.version
         ])
+    }
+    // Копируем resources в корень jar
+    from sourceSets.main.output
+    from('src/main/resources') {
+        include '**/*'
     }
 }
